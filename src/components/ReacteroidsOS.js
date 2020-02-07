@@ -97,16 +97,28 @@ export default class ReacteroidsOS extends Component {
     context.globalAlpha = 1;
 
     // Next set of asteroids
-    if(!this.asteroids.length){
-      let count = this.state.asteroidCount + 3;
-      this.setState({ asteroidCount: count });
-      this.generateAsteroids(count)
+    if(this.state.currentScore > 1000){
+      const maxAsteroids = 6;
+      if(this.state.asteroidCount !== maxAsteroids)
+        this.setState({ asteroidCount: maxAsteroids });
+
+      const add = maxAsteroids
+      - this.asteroids.filter(asteroid => asteroid.score === 5).length;
+      this.generateAsteroids(add)
+    }
+    else if(this.state.currentScore > 100){
+      const maxAsteroids = 4;
+      if(this.state.asteroidCount !== maxAsteroids)
+        this.setState({ asteroidCount: maxAsteroids });
+
+      const add = maxAsteroids
+      - this.asteroids.filter(asteroid => asteroid.score === 5).length;
+      this.generateAsteroids(add)
     }
 
     // Check for colisions
     this.checkCollisionsWith(this.bullets, this.asteroids);
     this.checkCollisionsWith(this.ship, this.asteroids);
-  //  this.checkCollisionWith(this.edge, this.asteroids);
 
     // Remove or render
     this.updateObjects(this.particles, 'particles')

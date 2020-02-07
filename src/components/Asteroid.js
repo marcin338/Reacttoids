@@ -15,7 +15,7 @@ export default class Asteroid {
     this.score = (80/this.radius)*5;
     this.create = args.create;
     this.addScore = args.addScore;
-    this.vertices = asteroidVertices(8, args.size)
+    this.vertices = asteroidVertices(8 , args.size)
   }
 
   destroy(){
@@ -54,10 +54,11 @@ export default class Asteroid {
           addScore: this.addScore.bind(this)
         });
         this.create(asteroid, 'asteroids');
-      }
+          }
     }
   }
 
+  
   render(state){
     // Move
     this.position.x += this.velocity.x;

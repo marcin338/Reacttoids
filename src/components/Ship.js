@@ -1,6 +1,9 @@
 import Bullet from './Bullet';
 import Particle from './Particle';
-import { rotatePoint, randomNumBetween } from './helpers';
+import {
+  rotatePoint,
+  randomNumBetween
+} from './helpers';
 
 export default class Ship {
   constructor(args) {
@@ -20,7 +23,7 @@ export default class Ship {
     this.getScore = args.score;
   }
 
-  destroy(){
+  destroy() {
     this.delete = true;
     this.onDie();
 
@@ -30,8 +33,8 @@ export default class Ship {
         lifeSpan: randomNumBetween(60, 100),
         size: randomNumBetween(1, 4),
         position: {
-          x: this.position.x + randomNumBetween(-this.radius/4, this.radius/4),
-          y: this.position.y + randomNumBetween(-this.radius/4, this.radius/4)
+          x: this.position.x + randomNumBetween(-this.radius / 4, this.radius / 4),
+          y: this.position.y + randomNumBetween(-this.radius / 4, this.radius / 4)
         },
         velocity: {
           x: randomNumBetween(-1.5, 1.5),
@@ -42,7 +45,7 @@ export default class Ship {
     }
   }
 
-  rotate(dir){
+  rotate(dir) {
     if (dir == 'LEFT') {
       this.rotation -= this.rotationSpeed;
     }
@@ -51,12 +54,18 @@ export default class Ship {
     }
   }
 
-  accelerate(val){
-    this.velocity.x -= Math.sin(-this.rotation*Math.PI/180) * this.speed;
-    this.velocity.y -= Math.cos(-this.rotation*Math.PI/180) * this.speed;
+  accelerate(val) {
+    this.velocity.x -= Math.sin(-this.rotation * Math.PI / 180) * this.speed;
+    this.velocity.y -= Math.cos(-this.rotation * Math.PI / 180) * this.speed;
 
     // Thruster particles
-    let posDelta = rotatePoint({x:0, y:-10}, {x:0,y:0}, (this.rotation-180) * Math.PI / 180);
+    let posDelta = rotatePoint({
+      x: 0,
+      y: -10
+    }, {
+      x: 0,
+      y: 0
+    }, (this.rotation - 180) * Math.PI / 180);
     const particle = new Particle({
       lifeSpan: randomNumBetween(20, 40),
       size: randomNumBetween(1, 3),
@@ -72,87 +81,43 @@ export default class Ship {
     this.create(particle, 'particles');
   }
 
-  render(state){
+  makeBullet(position, rotation) {
+    console.log(rotation)
+    const bullet = new Bullet({
+      ship: this,
+      getScore: this.getScore,
+      beginPosition: position,
+      rotate: rotation
+    });
+    this.create(bullet, 'bullets');
+  }
+
+  render(state) {
     // Controls
-    if(state.keys.up){
+    if (state.keys.up) {
       this.accelerate(1);
     }
-    if(state.keys.left){
+    if (state.keys.left) {
       this.rotate('LEFT');
     }
-    if(state.keys.right){
+    if (state.keys.right) {
       this.rotate('RIGHT');
     }
-    
 
-    
-    if(state.keys.space && Date.now() - this.lastShot > 300){
-    if(this.getScore>300)
-    {
-      const bullet1 = new Bullet({
-        ship: this,
-        getScore:this.getScore,
-        beginPosition: 15
-      });
-      const bullet2 = new Bullet({
-        ship: this,
-        getScore:this.getScore,
-        beginPosition: -15
-      });
-      const bullet3 = new Bullet({
-        ship: this,
-        getScore:this.getScore,
-        beginPosition: 0
-      });
-      this.create(bullet1, 'bullets');
-      this.create(bullet2, 'bullets');
-      this.create(bullet3, 'bullets');
-    }
-      if(this.getScore()>100)
-    {
-      const bullet1 = new Bullet({
-        ship: this,
-        getScore:this.getScore,
-        beginPosition: 15
-      });
-      const bullet2 = new Bullet({
-        ship: this,
-        getScore:this.getScore,
-        beginPosition: -15
-      });
-      const bullet3 = new Bullet({
-        ship: this,
-        getScore:this.getScore,
-        beginPosition: 0
-      });
-      this.create(bullet1, 'bullets');
-      this.create(bullet2, 'bullets');
-      this.create(bullet3, 'bullets');
-    }
 
-     else if(this.getScore() > 50)
-      {
-        const bullet = new Bullet({
-          ship: this,
-          getScore:this.getScore,
-          beginPosition: 10
-        });
-        this.create(bullet, 'bullets');
-        const bullet2 = new Bullet({
-          ship: this,
-          getScore:this.getScore,
-          beginPosition: -10
-        });
-        this.create(bullet2, 'bullets');
-      }
-      else
-      {
-        const bullet = new Bullet({
-          ship: this,
-          getScore:this.getScore,
-          beginPosition: 0
-        });
-        this.create(bullet, 'bullets');
+
+    if (state.keys.space && Date.now() - this.lastShot > 300) {
+      if (this.getScore() > 100) {
+        this.makeBullet(15, 20);
+        this.makeBullet(0, 0);
+        this.makeBullet(-15, -20);
+
+      } else if (this.getScore() > 50) {
+        this.makeBullet(-10, 10);
+        this.makeBullet(10, -10);
+
+      } else {
+        this.makeBullet(0, 0);
       }
       this.lastShot = Date.now();
     }
@@ -172,10 +137,10 @@ export default class Ship {
     }
 
     // Screen edges
-    if(this.position.x > state.screen.width) this.position.x = 0;
-    else if(this.position.x < 0) this.position.x = state.screen.width;
-    if(this.position.y > state.screen.height) this.position.y = 0;
-    else if(this.position.y < 0) this.position.y = state.screen.height;
+    if (this.position.x > state.screen.width) this.position.x = 0;
+    else if (this.position.x < 0) this.position.x = state.screen.width;
+    if (this.position.y > state.screen.height) this.position.y = 0;
+    else if (this.position.y < 0) this.position.y = state.screen.height;
 
     // Draw
     const context = state.context;
